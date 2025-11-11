@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 //import 'generar_pedido_screen.dart';
+import 'cocina_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,6 +28,13 @@ class HomeScreen extends StatelessWidget {
             _buildButton(context, 'Historial de pedidos', Colors.green, () {}),
             const SizedBox(height: 20),
             _buildButton(context, 'Clientes frecuentes', Colors.green, () {}),
+            const SizedBox(height: 20),
+            _buildButton(context, 'Pantalla de Cocina', Colors.green, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => CocinaScreen()),
+              );
+            }),
           ],
         ),
       ),
