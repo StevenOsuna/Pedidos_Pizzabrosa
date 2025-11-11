@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/cocina_screen.dart';
 
 void main() {
   runApp(PedidosPizzabrosaApp());
@@ -19,7 +20,7 @@ class PedidosPizzabrosaApp extends StatelessWidget {
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color(0xFFE0E0E0),
       ),
-      home: HomeScreen(),
+      home: const CocinaScreen(),
     );
   }
 }
