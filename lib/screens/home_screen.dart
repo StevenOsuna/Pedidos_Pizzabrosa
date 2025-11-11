@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'generar_pedido_screen.dart';
+//import 'generar_pedido_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,8 +9,10 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: const Text('Pedidos_Pizzabrosa',
-            style: TextStyle(fontStyle: FontStyle.italic)),
+        title: const Text(
+          'Pedidos_Pizzabrosa',
+          style: TextStyle(fontStyle: FontStyle.italic),
+        ),
         centerTitle: true,
       ),
       body: Center(
@@ -18,8 +20,8 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildButton(context, 'Generar pedido', Colors.green, () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => GenerarPedidoScreen()));
+              //Navigator.push(context,
+              //MaterialPageRoute(builder: (_) => GenerarPedidoScreen()));
             }),
             const SizedBox(height: 20),
             _buildButton(context, 'Historial de pedidos', Colors.green, () {}),
@@ -32,7 +34,11 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildButton(
-      BuildContext context, String text, Color color, VoidCallback onPressed) {
+    BuildContext context,
+    String text,
+    Color color,
+    VoidCallback onPressed,
+  ) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
