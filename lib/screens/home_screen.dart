@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'generar_pedido_screen.dart';
 import 'cocina_screen.dart';
+import 'menu_page.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -21,8 +21,10 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildButton(context, 'Generar pedido', Colors.green, () {
-              //Navigator.push(context,
-              //MaterialPageRoute(builder: (_) => GenerarPedidoScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MenuPage()),
+              );
             }),
             const SizedBox(height: 20),
             _buildButton(context, 'Historial de pedidos', Colors.green, () {}),

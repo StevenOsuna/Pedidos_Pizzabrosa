@@ -172,5 +172,3 @@ class _CocinaScreenState extends State<CocinaScreen> {
     );
   }
 }
-
-//prueba 1
