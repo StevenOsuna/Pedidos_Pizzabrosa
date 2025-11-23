@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "391230991156",
+    "project_id": "pedidos-pizzabrosa",
+    "storage_bucket": "pedidos-pizzabrosa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391230991156:android:43523cf5606abb047bd361",
+        "android_client_info": {
+          "package_name": "com.example.pedidos_pizzabrosa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjJbc1vFg7myQ3D2GKO2Mi5Ed0lq23-YE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
