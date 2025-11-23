@@ -9,6 +9,14 @@ class PedidoService {
     await ref.set(pedido.toMap());
   }
 
+  Future<void> actualizarEstado(String id, String estado) async {
+    await _db.child(id).update({'estado': estado});
+  }
+
+  Future<void> eliminarPedido(String id) async {
+    await _db.child(id).remove();
+  }
+
   // Stream en tiempo real (para CocinaScreen)
   Stream<List<Pedido>> obtenerPedidosTiempoReal() {
     return _db.onValue.map((event) {
