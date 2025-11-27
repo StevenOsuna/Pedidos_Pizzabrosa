@@ -20,8 +20,8 @@ class _CocinaScreenState extends State<CocinaScreen> {
         return Colors.yellow.shade200;
       case 'entregado':
         return Colors.grey.shade300;
-      default: // 'espera' u otros
-        return Colors.red.shade200;
+      default:
+        return Colors.red.shade200; // 'espera' u otros
     }
   }
 
@@ -31,9 +31,12 @@ class _CocinaScreenState extends State<CocinaScreen> {
   Future<void> entregarPedido(List<Pedido> pedidos) async {
     if (pedidos.isEmpty) return;
 
-    // 1. Eliminar el primer pedido (entregado)
+    // 1. Tomamos el primer pedido
     final first = pedidos.first;
     if (first.id != null) {
+      // 1a) Guardar en historial
+      await pedidoService.moverAPedidosHistorial(first);
+      // 1b) Eliminar del nodo principal
       await pedidoService.eliminarPedido(first.id!);
     }
 
@@ -41,12 +44,11 @@ class _CocinaScreenState extends State<CocinaScreen> {
     if (pedidos.length > 1 && pedidos[1].id != null) {
       await pedidoService.actualizarEstado(pedidos[1].id!, 'preparacion');
     }
-
     if (pedidos.length > 2 && pedidos[2].id != null) {
       await pedidoService.actualizarEstado(pedidos[2].id!, 'siguiente');
     }
 
-    // Resto van a espera
+    // Los demás quedan en espera
     for (int i = 3; i < pedidos.length; i++) {
       if (pedidos[i].id != null) {
         await pedidoService.actualizarEstado(pedidos[i].id!, 'espera');
@@ -54,20 +56,13 @@ class _CocinaScreenState extends State<CocinaScreen> {
     }
   }
 
-  // -------------------------------------------------------
-  // Construir tarjeta de pedido (usa MediaQuery para responsividad)
-  // -------------------------------------------------------
   Widget _buildPedidoCard(BuildContext context, Pedido pedido) {
     final double anchoPantalla = MediaQuery.of(context).size.width;
-
-    // Breakpoints responsivos (ajusta si quieres otros valores)
     final double cardWidth = anchoPantalla < 500
-        ? anchoPantalla *
-              0.80 // celular: tarjeta amplia y centrada
+        ? anchoPantalla * 0.80
         : anchoPantalla < 900
-        ? anchoPantalla /
-              2.8 // tablet: 2-3 tarjetas visibles
-        : anchoPantalla / 3.2; // desktop/TV: 3 tarjetas cómodas
+        ? anchoPantalla / 2.8
+        : anchoPantalla / 3.2;
 
     return Container(
       width: cardWidth,
@@ -122,7 +117,8 @@ class _CocinaScreenState extends State<CocinaScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Text(
-                        '• ${item.paquete} - ${item.tamano} ${item.notas.isNotEmpty && item.notas.isNotEmpty ? "(${item.notas})" : ""}',
+                        '• ${item.paquete} - ${item.tamano}'
+                        '${item.notas.isNotEmpty ? " (${item.notas})" : ""}',
                         style: const TextStyle(fontSize: 16),
                       ),
                     );
@@ -167,11 +163,8 @@ class _CocinaScreenState extends State<CocinaScreen> {
             );
           }
 
-          // Usamos LayoutBuilder para mejor control en pantallas pequeñas
           return LayoutBuilder(
             builder: (context, constraints) {
-              //final bool esCelular = constraints.maxWidth < 500;
-
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(

@@ -23,7 +23,7 @@ class HistorialScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: StreamBuilder<List<Pedido>>(
-        stream: pedidoService.obtenerPedidosHistorial(),
+        stream: pedidoService.obtenerHistorial(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
@@ -66,7 +66,9 @@ class HistorialScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            pedido.clienteNombre,
+                            pedido.clienteNombre.isEmpty
+                                ? "Sin nombre"
+                                : pedido.clienteNombre,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
