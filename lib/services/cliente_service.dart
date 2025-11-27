@@ -2,22 +2,38 @@ import 'package:firebase_database/firebase_database.dart';
 import '../models/cliente.dart';
 
 class ClienteService {
-  final DatabaseReference _db = FirebaseDatabase.instance.ref('clientes');
+  final DatabaseReference ref = FirebaseDatabase.instance.ref().child(
+    "clientes",
+  );
 
-  Future<String> agregarCliente(Cliente cliente) async {
-    final newRef = _db.push();
-    await newRef.set(cliente.toMap());
-    return newRef.key!; // regresamos ID del cliente
+  Future<void> agregarCliente(Cliente cliente) async {
+    final nuevo = ref.push();
+    await nuevo.set(cliente.toJson());
   }
 
-  Future<List<Cliente>> obtenerClientes() async {
-    final snapshot = await _db.get();
-    if (!snapshot.exists) return [];
+  Future<void> actualizarCliente(String id, Cliente cliente) async {
+    await ref.child(id).update(cliente.toJson());
+  }
 
-    final data = Map<String, dynamic>.from(snapshot.value as Map);
+  Future<void> eliminarCliente(String id) async {
+    await ref.child(id).remove();
+  }
 
-    return data.entries.map((e) {
-      return Cliente.fromMap(e.key, Map<String, dynamic>.from(e.value));
-    }).toList();
+  Stream<List<Cliente>> obtenerClientes() {
+    return ref.onValue.map((event) {
+      final data = event.snapshot.value as Map?;
+      if (data == null) return [];
+
+      return data.entries.map((e) => Cliente.fromJson(e.value, e.key)).toList()
+        ..sort((a, b) => a.nombre.compareTo(b.nombre));
+    });
+  }
+
+  Future<List<Cliente>> obtenerClientesUnaVez() async {
+    final snapshot = await ref.get();
+    final data = snapshot.value as Map?;
+    if (data == null) return [];
+    return data.entries.map((e) => Cliente.fromJson(e.value, e.key)).toList()
+      ..sort((a, b) => a.nombre.compareTo(b.nombre));
   }
 }

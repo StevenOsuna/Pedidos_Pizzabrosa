@@ -10,6 +10,7 @@ void main() async {
 }
 
 class PedidosPizzabrosaApp extends StatelessWidget {
+  const PedidosPizzabrosaApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

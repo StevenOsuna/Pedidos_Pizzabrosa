@@ -1,26 +1,32 @@
 class Cliente {
-  final String? id;
+  String? id;
   final String nombre;
-  final String telefono;
+  final String cel;
   final String direccion;
+  final int timestamp;
 
   Cliente({
     this.id,
     required this.nombre,
-    required this.telefono,
+    required this.cel,
     required this.direccion,
+    required this.timestamp,
   });
 
-  Map<String, dynamic> toMap() {
-    return {'nombre': nombre, 'telefono': telefono, 'direccion': direccion};
-  }
+  Map<String, dynamic> toJson() => {
+    "nombre": nombre,
+    "cel": cel,
+    "direccion": direccion,
+    "timestamp": timestamp,
+  };
 
-  factory Cliente.fromMap(String id, Map<String, dynamic> data) {
+  factory Cliente.fromJson(Map json, String id) {
     return Cliente(
       id: id,
-      nombre: data['nombre'],
-      telefono: data['telefono'],
-      direccion: data['direccion'],
+      nombre: json["nombre"],
+      cel: json["cel"],
+      direccion: json["direccion"],
+      timestamp: json["timestamp"],
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'cocina_screen.dart';
 import 'menu_page.dart';
 import 'historial_screen.dart';
+import 'clientes_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -56,7 +57,14 @@ class HomeScreen extends StatelessWidget {
                     texto: "Clientes frecuentes",
                     color: Colors.green,
                     esCelular: esCelular,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ClientesScreen(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
                   _botonPrincipal(

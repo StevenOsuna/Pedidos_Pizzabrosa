@@ -120,7 +120,7 @@ class _CocinaScreenState extends State<CocinaScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Text(
-                        '• ${item.paquete} - ${item.tamano} ${item.notas != null && item.notas!.isNotEmpty ? "(${item.notas})" : ""}',
+                        '• ${item.paquete} - ${item.tamano} ${item.notas.isNotEmpty && item.notas.isNotEmpty ? "(${item.notas})" : ""}',
                         style: const TextStyle(fontSize: 16),
                       ),
                     );
@@ -168,7 +168,7 @@ class _CocinaScreenState extends State<CocinaScreen> {
           // Usamos LayoutBuilder para mejor control en pantallas pequeñas
           return LayoutBuilder(
             builder: (context, constraints) {
-              final bool esCelular = constraints.maxWidth < 500;
+              //final bool esCelular = constraints.maxWidth < 500;
 
               return Padding(
                 padding: const EdgeInsets.all(16.0),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/pedidos.dart';
+import '../models/cliente.dart';
 import '../services/pedido_service.dart';
+import '../services/cliente_service.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -152,6 +154,135 @@ class _MenuPageState extends State<MenuPage> {
 
   // Modal cliente
   void _agregarClienteModal() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return SizedBox(
+          height: 220,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                "Opciones de cliente",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const Divider(),
+
+              // Seleccionar cliente frecuente
+              ListTile(
+                leading: const Icon(Icons.person_search, color: Colors.blue),
+                title: const Text("Seleccionar cliente frecuente"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _seleccionarClienteModal();
+                },
+              ),
+
+              // Agregar nuevo cliente
+              ListTile(
+                leading: const Icon(Icons.person_add, color: Colors.green),
+                title: const Text("Agregar cliente nuevo"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _modalClienteNuevo();
+                },
+              ),
+
+              // Pedido sin cliente
+              ListTile(
+                leading: const Icon(Icons.person_off, color: Colors.red),
+                title: const Text("Pedido sin registrar cliente"),
+                onTap: () {
+                  setState(() {
+                    cliente["nombre"] = "Cliente sin registro";
+                    cliente["cel"] = "-";
+                    cliente["direccion"] = "-";
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _seleccionarClienteModal() async {
+    final clientes = await ClienteService().obtenerClientesUnaVez();
+    if (!mounted) return;
+
+    TextEditingController busqueda = TextEditingController();
+
+    List<Cliente> filtrados = List.from(clientes);
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, actualizar) {
+            void filtrar(String texto) {
+              texto = texto.toLowerCase();
+              actualizar(() {
+                filtrados = clientes.where((c) {
+                  return c.nombre.toLowerCase().contains(texto) ||
+                      c.cel.contains(texto);
+                }).toList();
+              });
+            }
+
+            return AlertDialog(
+              title: const Text("Seleccionar cliente"),
+              content: SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: busqueda,
+                      onChanged: filtrar,
+                      decoration: const InputDecoration(
+                        labelText: "Buscar...",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 300,
+                      child: ListView.builder(
+                        itemCount: filtrados.length,
+                        itemBuilder: (context, index) {
+                          final c = filtrados[index];
+                          return ListTile(
+                            title: Text(c.nombre),
+                            subtitle: Text("${c.cel} • ${c.direccion}"),
+                            onTap: () {
+                              setState(() {
+                                cliente["nombre"] = c.nombre;
+                                cliente["cel"] = c.cel;
+                                cliente["direccion"] = c.direccion;
+                              });
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _modalClienteNuevo() {
     TextEditingController nombre = TextEditingController();
     TextEditingController cel = TextEditingController();
     TextEditingController direccion = TextEditingController();
@@ -160,22 +291,25 @@ class _MenuPageState extends State<MenuPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Agregar cliente"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nombre,
-              decoration: const InputDecoration(labelText: "Nombre"),
-            ),
-            TextField(
-              controller: cel,
-              decoration: const InputDecoration(labelText: "Celular"),
-            ),
-            TextField(
-              controller: direccion,
-              decoration: const InputDecoration(labelText: "Dirección"),
-            ),
-          ],
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nombre,
+                decoration: const InputDecoration(labelText: "Nombre"),
+              ),
+              TextField(
+                controller: cel,
+                decoration: const InputDecoration(labelText: "Celular"),
+              ),
+              TextField(
+                controller: direccion,
+                decoration: const InputDecoration(labelText: "Direccion"),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -184,11 +318,23 @@ class _MenuPageState extends State<MenuPage> {
           ),
           ElevatedButton(
             onPressed: () {
+              if (nombre.text.isEmpty) return;
+
+              final nuevo = Cliente(
+                nombre: nombre.text,
+                cel: cel.text,
+                direccion: direccion.text,
+                timestamp: DateTime.now().millisecondsSinceEpoch,
+              );
+
+              ClienteService().agregarCliente(nuevo);
+
               setState(() {
                 cliente["nombre"] = nombre.text;
                 cliente["cel"] = cel.text;
                 cliente["direccion"] = direccion.text;
               });
+
               Navigator.pop(context);
             },
             child: const Text("Guardar"),
@@ -232,6 +378,7 @@ class _MenuPageState extends State<MenuPage> {
     );
 
     await pedidoService.agregarPedido(pedido);
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Pedido registrado exitosamente")),

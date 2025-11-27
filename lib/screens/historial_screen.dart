@@ -99,7 +99,8 @@ class HistorialScreen extends StatelessWidget {
                                       vertical: 4,
                                     ),
                                     child: Text(
-                                      "• ${item.paquete} - ${item.tamano} ${item.notas.isNotEmpty ? "(" + item.notas + ")" : ""}",
+                                      "• ${item.paquete} - ${item.tamano} ${item.notas.isNotEmpty ? "(${item.notas})" : ""}",
+
                                       style: TextStyle(
                                         fontSize: esCelular ? 16 : 18,
                                       ),
