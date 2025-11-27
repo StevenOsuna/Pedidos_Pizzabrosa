@@ -1,43 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 import '../models/pedidos.dart';
+import '../services/pedido_service.dart';
+import 'package:intl/intl.dart';
 
-class HistorialScreen extends StatefulWidget {
-  const HistorialScreen({super.key});
+class HistorialScreen extends StatelessWidget {
+  final PedidoService pedidoService = PedidoService();
 
-  @override
-  // ignore: library_private_types_in_public_api
-  _HistorialScreenState createState() => _HistorialScreenState();
-}
+  HistorialScreen({super.key});
 
-class _HistorialScreenState extends State<HistorialScreen> {
-  final DatabaseReference ref = FirebaseDatabase.instance.ref("pedidos");
+  String formatearFecha(int timestamp) {
+    final fecha = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return DateFormat('dd/MM/yyyy – HH:mm').format(fecha);
+  }
 
   @override
   Widget build(BuildContext context) {
-    //final double ancho = MediaQuery.of(context).size.width;
-    //final bool esCelular = ancho < 600;
-
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text("Historial de Pedidos"),
+        backgroundColor: Colors.redAccent,
         centerTitle: true,
       ),
-
-      body: StreamBuilder<DatabaseEvent>(
-        stream: ref.onValue,
+      body: StreamBuilder<List<Pedido>>(
+        stream: pedidoService.obtenerPedidosHistorial(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
-            return const Center(child: Text("No hay pedidos registrados"));
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
           }
 
-          final raw = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
-          final pedidos = raw.entries.map((entry) {
-            return Pedido.fromJson(entry.value, entry.key);
-          }).toList();
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          // más recientes primero
-          pedidos.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          final pedidos = snapshot.data!;
+
+          if (pedidos.isEmpty) {
+            return const Center(
+              child: Text(
+                "No hay pedidos en el historial",
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+          }
 
           return ListView.builder(
             padding: const EdgeInsets.all(12),
@@ -46,49 +51,32 @@ class _HistorialScreenState extends State<HistorialScreen> {
               final pedido = pedidos[index];
 
               return Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 elevation: 3,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Cliente
-                      Text(
-                        pedido.clienteNombre.isEmpty
-                            ? "Cliente no registrado"
-                            : pedido.clienteNombre,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
+                      // ENCABEZADO
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(Icons.phone, size: 18),
-                          const SizedBox(width: 6),
                           Text(
-                            pedido.clienteCel.isEmpty
-                                ? "Sin teléfono"
-                                : pedido.clienteCel,
+                            pedido.clienteNombre,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on, size: 18),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              pedido.clienteDireccion.isEmpty
-                                  ? "Sin dirección"
-                                  : pedido.clienteDireccion,
+                          Text(
+                            formatearFecha(pedido.timestamp),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
                             ),
                           ),
                         ],
@@ -96,51 +84,27 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
                       const SizedBox(height: 10),
 
-                      // Estado del pedido
-                      Row(
-                        children: [
-                          const Icon(Icons.flag),
-                          const SizedBox(width: 6),
-                          Text("Estado: ${pedido.estado}"),
-                        ],
-                      ),
+                      // ITEMS
+                      ...pedido.items.map((item) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Text(
+                            "• ${item.paquete} - ${item.tamano} "
+                            "${item.notas.isNotEmpty ? "(${item.notas})" : ""}",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }),
 
-                      const Divider(height: 20),
+                      const Divider(height: 22),
 
-                      // ITEMS DEL PEDIDO
-                      const Text(
-                        "Artículos:",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: pedido.items.map((item) {
-                          final notas = item.notas.isEmpty
-                              ? ""
-                              : " (${item.notas})";
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2),
-                            child: Text(
-                              "• ${item.paquete} - ${item.tamano}$notas",
-                              style: const TextStyle(fontSize: 15),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // Fecha
+                      // ESTADO
                       Text(
-                        "Fecha: ${DateTime.fromMillisecondsSinceEpoch(pedido.timestamp).toLocal()}",
-                        style: const TextStyle(color: Colors.grey),
+                        "Estado final: ${pedido.estado}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
                       ),
                     ],
                   ),

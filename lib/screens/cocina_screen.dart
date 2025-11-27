@@ -41,10 +41,12 @@ class _CocinaScreenState extends State<CocinaScreen> {
     if (pedidos.length > 1 && pedidos[1].id != null) {
       await pedidoService.actualizarEstado(pedidos[1].id!, 'preparacion');
     }
+
     if (pedidos.length > 2 && pedidos[2].id != null) {
       await pedidoService.actualizarEstado(pedidos[2].id!, 'siguiente');
     }
 
+    // Resto van a espera
     for (int i = 3; i < pedidos.length; i++) {
       if (pedidos[i].id != null) {
         await pedidoService.actualizarEstado(pedidos[i].id!, 'espera');
