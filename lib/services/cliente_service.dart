@@ -21,19 +21,42 @@ class ClienteService {
 
   Stream<List<Cliente>> obtenerClientes() {
     return ref.onValue.map((event) {
-      final data = event.snapshot.value as Map?;
-      if (data == null) return [];
+      final raw = event.snapshot.value;
 
-      return data.entries.map((e) => Cliente.fromJson(e.value, e.key)).toList()
-        ..sort((a, b) => a.nombre.compareTo(b.nombre));
+      if (raw == null) return [];
+
+      // Convertimos el snapshot completo
+      final data = Map<dynamic, dynamic>.from(raw as Map);
+
+      return data.entries.map((e) {
+        final value = e.value;
+
+        // Conversión segura
+        final mapValue = (value is Map<dynamic, dynamic>)
+            ? Map<dynamic, dynamic>.from(value)
+            : <dynamic, dynamic>{};
+
+        return Cliente.fromJson(mapValue, e.key);
+      }).toList()..sort((a, b) => a.nombre.compareTo(b.nombre));
     });
   }
 
   Future<List<Cliente>> obtenerClientesUnaVez() async {
     final snapshot = await ref.get();
-    final data = snapshot.value as Map?;
-    if (data == null) return [];
-    return data.entries.map((e) => Cliente.fromJson(e.value, e.key)).toList()
-      ..sort((a, b) => a.nombre.compareTo(b.nombre));
+    final raw = snapshot.value;
+
+    if (raw == null) return [];
+
+    final data = Map<dynamic, dynamic>.from(raw as Map);
+
+    return data.entries.map((e) {
+      final value = e.value;
+
+      final mapValue = (value is Map<dynamic, dynamic>)
+          ? Map<dynamic, dynamic>.from(value)
+          : <dynamic, dynamic>{};
+
+      return Cliente.fromJson(mapValue, e.key);
+    }).toList()..sort((a, b) => a.nombre.compareTo(b.nombre));
   }
 }

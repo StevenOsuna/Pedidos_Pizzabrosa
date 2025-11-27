@@ -20,13 +20,17 @@ class Cliente {
     "timestamp": timestamp,
   };
 
-  factory Cliente.fromJson(Map json, String id) {
+  factory Cliente.fromJson(dynamic json, String id) {
+    if (json == null || json is! Map) {
+      return Cliente(id: id, nombre: "", cel: "", direccion: "", timestamp: 0);
+    }
+
     return Cliente(
       id: id,
-      nombre: json["nombre"],
-      cel: json["cel"],
-      direccion: json["direccion"],
-      timestamp: json["timestamp"],
+      nombre: json["nombre"] ?? "",
+      cel: json["cel"] ?? "",
+      direccion: json["direccion"] ?? "",
+      timestamp: json["timestamp"] ?? 0,
     );
   }
 }

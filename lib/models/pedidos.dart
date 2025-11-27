@@ -11,15 +11,18 @@ class PedidoItem {
 
   Map<String, dynamic> toJson() => {
     'paquete': paquete,
-    'tamaño': tamano,
+    'tamano': tamano,
     'notas': notas,
   };
 
-  factory PedidoItem.fromJson(Map<String, dynamic> json) => PedidoItem(
-    paquete: json['paquete'],
-    tamano: json['tamaño'],
-    notas: json['notas'],
-  );
+  factory PedidoItem.fromJson(dynamic json) {
+    final data = Map<String, dynamic>.from(json);
+    return PedidoItem(
+      paquete: data['paquete'] ?? '',
+      tamano: data['tamano'] ?? '',
+      notas: data['notas'] ?? '',
+    );
+  }
 }
 
 class Pedido {
@@ -27,7 +30,7 @@ class Pedido {
   final String clienteNombre;
   final String clienteCel;
   final String clienteDireccion;
-  final String estado; // preparacion / siguiente / espera / entregado
+  final String estado;
   final int timestamp;
   final List<PedidoItem> items;
 
@@ -50,15 +53,19 @@ class Pedido {
     'items': items.map((i) => i.toJson()).toList(),
   };
 
-  factory Pedido.fromJson(Map<String, dynamic> json, String id) => Pedido(
-    id: id,
-    clienteNombre: json['clienteNombre'],
-    clienteCel: json['clienteCel'],
-    clienteDireccion: json['clienteDireccion'],
-    estado: json['estado'],
-    timestamp: json['timestamp'],
-    items: (json['items'] as List<dynamic>)
-        .map((i) => PedidoItem.fromJson(i))
-        .toList(),
-  );
+  factory Pedido.fromJson(dynamic json, String id) {
+    final data = Map<String, dynamic>.from(json);
+
+    return Pedido(
+      id: id,
+      clienteNombre: data['clienteNombre'] ?? '',
+      clienteCel: data['clienteCel'] ?? '',
+      clienteDireccion: data['clienteDireccion'] ?? '',
+      estado: data['estado'] ?? 'preparando',
+      timestamp: data['timestamp'] ?? 0,
+      items: (data['items'] as List<dynamic>? ?? [])
+          .map((i) => PedidoItem.fromJson(i))
+          .toList(),
+    );
+  }
 }
