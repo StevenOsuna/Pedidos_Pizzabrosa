@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -75,7 +76,7 @@ class _ComandaScreenState extends State<ComandaScreen> {
               }).toList(),
               pw.SizedBox(height: 14),
               pw.Text("Observaciones: "),
-              pw.SizedBox(height: 30),
+              pw.SizedBox(height: 0),
               pw.Center(
                 child: pw.Text(
                   "Gracias por su preferencia",
@@ -100,9 +101,7 @@ class _ComandaScreenState extends State<ComandaScreen> {
     try {
       final bytes = await _buildPdfBytes(widget.pedido);
       final filename =
-          (widget.pedido.id ??
-              DateTime.now().millisecondsSinceEpoch.toString()) +
-          '.pdf';
+          '${widget.pedido.id ?? DateTime.now().millisecondsSinceEpoch.toString()}.pdf';
       final url = await _uploadPdf(bytes, filename);
 
       setState(() {
