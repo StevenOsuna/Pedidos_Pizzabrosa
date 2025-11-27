@@ -10,7 +10,7 @@ class CocinaScreen extends StatefulWidget {
 }
 
 class _CocinaScreenState extends State<CocinaScreen> {
-  final pedidoService = PedidoService();
+  final PedidoService pedidoService = PedidoService();
 
   Color _colorPorEstado(String estado) {
     switch (estado) {
@@ -18,39 +18,57 @@ class _CocinaScreenState extends State<CocinaScreen> {
         return Colors.green.shade200;
       case 'siguiente':
         return Colors.yellow.shade200;
-      default:
-        return Colors.red.shade200; // espera
+      case 'entregado':
+        return Colors.grey.shade300;
+      default: // 'espera' u otros
+        return Colors.red.shade200;
     }
   }
 
   // -------------------------------------------------------
   // Procesar botón ENTREGAR
   // -------------------------------------------------------
-  void entregarPedido(List<Pedido> pedidos) async {
+  Future<void> entregarPedido(List<Pedido> pedidos) async {
     if (pedidos.isEmpty) return;
 
     // 1. Eliminar el primer pedido (entregado)
-    await pedidoService.eliminarPedido(pedidos.first.id!);
+    final first = pedidos.first;
+    if (first.id != null) {
+      await pedidoService.eliminarPedido(first.id!);
+    }
 
     // 2. Reordenar estados de los pedidos restantes
-    if (pedidos.length > 1) {
+    if (pedidos.length > 1 && pedidos[1].id != null) {
       await pedidoService.actualizarEstado(pedidos[1].id!, 'preparacion');
     }
-    if (pedidos.length > 2) {
+    if (pedidos.length > 2 && pedidos[2].id != null) {
       await pedidoService.actualizarEstado(pedidos[2].id!, 'siguiente');
     }
 
     for (int i = 3; i < pedidos.length; i++) {
-      await pedidoService.actualizarEstado(pedidos[i].id!, 'espera');
+      if (pedidos[i].id != null) {
+        await pedidoService.actualizarEstado(pedidos[i].id!, 'espera');
+      }
     }
   }
 
   // -------------------------------------------------------
-  // Construir tarjeta de pedido
+  // Construir tarjeta de pedido (usa MediaQuery para responsividad)
   // -------------------------------------------------------
-  Widget _buildPedidoCard(Pedido pedido, int index, int total) {
+  Widget _buildPedidoCard(BuildContext context, Pedido pedido) {
+    final double anchoPantalla = MediaQuery.of(context).size.width;
+
+    // Breakpoints responsivos (ajusta si quieres otros valores)
+    final double cardWidth = anchoPantalla < 500
+        ? anchoPantalla *
+              0.80 // celular: tarjeta amplia y centrada
+        : anchoPantalla < 900
+        ? anchoPantalla /
+              2.8 // tablet: 2-3 tarjetas visibles
+        : anchoPantalla / 3.2; // desktop/TV: 3 tarjetas cómodas
+
     return Container(
-      width: MediaQuery.of(context).size.width / 3 - 20,
+      width: cardWidth,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Card(
         elevation: 5,
@@ -66,10 +84,14 @@ class _CocinaScreenState extends State<CocinaScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Pedido',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  Text(
+                    'Pedido${pedido.id != null ? ' #${pedido.id}' : ''}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     pedido.clienteNombre,
                     style: const TextStyle(fontSize: 16, color: Colors.black54),
@@ -78,7 +100,7 @@ class _CocinaScreenState extends State<CocinaScreen> {
                   Text(
                     'Estado: ${pedido.estado}',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       color: pedido.estado == 'preparacion'
                           ? Colors.redAccent
                           : Colors.black87,
@@ -98,7 +120,7 @@ class _CocinaScreenState extends State<CocinaScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Text(
-                        '• ${item.paquete} - ${item.tamano}',
+                        '• ${item.paquete} - ${item.tamano} ${item.notas != null && item.notas!.isNotEmpty ? "(${item.notas})" : ""}',
                         style: const TextStyle(fontSize: 16),
                       ),
                     );
@@ -124,10 +146,13 @@ class _CocinaScreenState extends State<CocinaScreen> {
         backgroundColor: Colors.redAccent,
         centerTitle: true,
       ),
-
       body: StreamBuilder<List<Pedido>>(
         stream: pedidoService.obtenerPedidosTiempoReal(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -140,45 +165,54 @@ class _CocinaScreenState extends State<CocinaScreen> {
             );
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // LISTA HORIZONTAL DE PEDIDOS
-                Expanded(
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: pedidos.length,
-                    itemBuilder: (context, index) {
-                      return _buildPedidoCard(
-                        pedidos[index],
-                        index,
-                        pedidos.length,
-                      );
-                    },
-                  ),
-                ),
+          // Usamos LayoutBuilder para mejor control en pantallas pequeñas
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final bool esCelular = constraints.maxWidth < 500;
 
-                const SizedBox(height: 20),
-
-                // BOTÓN ENTREGAR
-                ElevatedButton.icon(
-                  onPressed: () => entregarPedido(pedidos),
-                  icon: const Icon(Icons.check_circle_outline, size: 26),
-                  label: const Text(
-                    'ENTREGAR',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    minimumSize: const Size(double.infinity, 60),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // LISTA HORIZONTAL DE PEDIDOS
+                    Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: pedidos.length,
+                        itemBuilder: (context, index) {
+                          return _buildPedidoCard(context, pedidos[index]);
+                        },
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(height: 20),
+
+                    // BOTÓN ENTREGAR
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => entregarPedido(pedidos),
+                        icon: const Icon(Icons.check_circle_outline, size: 26),
+                        label: const Text(
+                          'ENTREGAR',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          minimumSize: const Size(double.infinity, 60),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),

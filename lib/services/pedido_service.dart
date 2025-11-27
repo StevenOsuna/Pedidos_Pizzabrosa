@@ -2,34 +2,35 @@ import 'package:firebase_database/firebase_database.dart';
 import '../models/pedidos.dart';
 
 class PedidoService {
-  final DatabaseReference _db = FirebaseDatabase.instance.ref('pedidos');
+  final DatabaseReference ref = FirebaseDatabase.instance.ref().child(
+    "pedidos",
+  );
 
+  // Agregar pedido
   Future<void> agregarPedido(Pedido pedido) async {
-    final ref = _db.push();
-    await ref.set(pedido.toMap());
+    final newRef = ref.push();
+    await newRef.set(pedido.toJson());
   }
 
+  // Actualizar estado
   Future<void> actualizarEstado(String id, String estado) async {
-    await _db.child(id).update({'estado': estado});
+    await ref.child(id).update({'estado': estado});
   }
 
+  // Eliminar pedido
   Future<void> eliminarPedido(String id) async {
-    await _db.child(id).remove();
+    await ref.child(id).remove();
   }
 
-  // Stream en tiempo real (para CocinaScreen)
+  // Stream en tiempo real
   Stream<List<Pedido>> obtenerPedidosTiempoReal() {
-    return _db.onValue.map((event) {
-      if (!event.snapshot.exists) return [];
+    return ref.onValue.map((event) {
+      final data = event.snapshot.value as Map?;
+      if (data == null) return [];
 
-      final data = Map<String, dynamic>.from(event.snapshot.value as Map);
-
-      final pedidos = data.entries.map((e) {
-        return Pedido.fromMap(e.key, Map<String, dynamic>.from(e.value));
-      }).toList();
-
-      pedidos.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-      return pedidos;
+      return data.entries.map((e) {
+        return Pedido.fromJson(e.value, e.key);
+      }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
     });
   }
 }

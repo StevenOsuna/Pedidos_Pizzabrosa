@@ -45,6 +45,7 @@ class DefaultFirebaseOptions {
     appId: '1:391230991156:web:8acc964fa7b6daf57bd361',
     messagingSenderId: '391230991156',
     projectId: 'pedidos-pizzabrosa',
+    databaseURL: 'https://pedidos-pizzabrosa-default-rtdb.firebaseio.com/',
     authDomain: 'pedidos-pizzabrosa.firebaseapp.com',
     storageBucket: 'pedidos-pizzabrosa.firebasestorage.app',
   );
@@ -54,6 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:391230991156:android:43523cf5606abb047bd361',
     messagingSenderId: '391230991156',
     projectId: 'pedidos-pizzabrosa',
+    databaseURL: 'https://pedidos-pizzabrosa-default-rtdb.firebaseio.com/',
     storageBucket: 'pedidos-pizzabrosa.firebasestorage.app',
   );
 
@@ -62,6 +64,7 @@ class DefaultFirebaseOptions {
     appId: '1:391230991156:ios:cf63efed9c6538627bd361',
     messagingSenderId: '391230991156',
     projectId: 'pedidos-pizzabrosa',
+    databaseURL: 'https://pedidos-pizzabrosa-default-rtdb.firebaseio.com/',
     storageBucket: 'pedidos-pizzabrosa.firebasestorage.app',
     iosBundleId: 'com.example.pedidosPizzabrosa',
   );
@@ -71,6 +74,7 @@ class DefaultFirebaseOptions {
     appId: '1:391230991156:ios:cf63efed9c6538627bd361',
     messagingSenderId: '391230991156',
     projectId: 'pedidos-pizzabrosa',
+    databaseURL: 'https://pedidos-pizzabrosa-default-rtdb.firebaseio.com/',
     storageBucket: 'pedidos-pizzabrosa.firebasestorage.app',
     iosBundleId: 'com.example.pedidosPizzabrosa',
   );
@@ -80,6 +84,7 @@ class DefaultFirebaseOptions {
     appId: '1:391230991156:web:418cd0571c32bb5e7bd361',
     messagingSenderId: '391230991156',
     projectId: 'pedidos-pizzabrosa',
+    databaseURL: 'https://pedidos-pizzabrosa-default-rtdb.firebaseio.com/',
     authDomain: 'pedidos-pizzabrosa.firebaseapp.com',
     storageBucket: 'pedidos-pizzabrosa.firebasestorage.app',
   );

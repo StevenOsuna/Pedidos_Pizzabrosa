@@ -1,46 +1,64 @@
-import 'item_pedido.dart';
+class PedidoItem {
+  final String paquete;
+  final String tamano;
+  final String notas;
+
+  PedidoItem({
+    required this.paquete,
+    required this.tamano,
+    required this.notas,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'paquete': paquete,
+    'tamaño': tamano,
+    'notas': notas,
+  };
+
+  factory PedidoItem.fromJson(Map<String, dynamic> json) => PedidoItem(
+    paquete: json['paquete'],
+    tamano: json['tamaño'],
+    notas: json['notas'],
+  );
+}
 
 class Pedido {
-  final String? id;
-  final String clienteId; // referencia a Cliente
-  final String clienteNombre; // para mostrar rápido en pantalla
-  final List<ItemPedido> items; // pizzas solicitadas
-  final String estado; // espera, siguiente, preparacion, entregado
+  String? id;
+  final String clienteNombre;
+  final String clienteCel;
+  final String clienteDireccion;
+  final String estado; // preparacion / siguiente / espera / entregado
   final int timestamp;
-  final double total;
+  final List<PedidoItem> items;
 
   Pedido({
     this.id,
-    required this.clienteId,
     required this.clienteNombre,
-    required this.items,
+    required this.clienteCel,
+    required this.clienteDireccion,
     required this.estado,
     required this.timestamp,
-    required this.total,
+    required this.items,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'clienteId': clienteId,
-      'clienteNombre': clienteNombre,
-      'items': items.map((i) => i.toMap()).toList(),
-      'estado': estado,
-      'timestamp': timestamp,
-      'total': total,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+    'clienteNombre': clienteNombre,
+    'clienteCel': clienteCel,
+    'clienteDireccion': clienteDireccion,
+    'estado': estado,
+    'timestamp': timestamp,
+    'items': items.map((i) => i.toJson()).toList(),
+  };
 
-  factory Pedido.fromMap(String id, Map<String, dynamic> data) {
-    return Pedido(
-      id: id,
-      clienteId: data['clienteId'],
-      clienteNombre: data['clienteNombre'],
-      items: (data['items'] as List)
-          .map((e) => ItemPedido.fromMap(Map<String, dynamic>.from(e)))
-          .toList(),
-      estado: data['estado'],
-      timestamp: data['timestamp'],
-      total: (data['total'] ?? 0).toDouble(),
-    );
-  }
+  factory Pedido.fromJson(Map<String, dynamic> json, String id) => Pedido(
+    id: id,
+    clienteNombre: json['clienteNombre'],
+    clienteCel: json['clienteCel'],
+    clienteDireccion: json['clienteDireccion'],
+    estado: json['estado'],
+    timestamp: json['timestamp'],
+    items: (json['items'] as List<dynamic>)
+        .map((i) => PedidoItem.fromJson(i))
+        .toList(),
+  );
 }
