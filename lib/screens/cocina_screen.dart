@@ -81,13 +81,6 @@ class _CocinaScreenState extends State<CocinaScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Pedido${pedido.id != null ? ' #${pedido.id}' : ''}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                   const SizedBox(height: 4),
                   Text(
                     pedido.clienteNombre,

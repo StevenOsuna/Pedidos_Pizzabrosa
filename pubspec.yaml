@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    assets:
+      - assets/logo.jpg
 
   firebase_core: ^2.25.4
   firebase_storage: ^11.7.2
@@ -41,6 +43,7 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.13.1
   path_provider: ^2.0.15
+  firebase_database: ^10.5.7
 
 dev_dependencies:
   flutter_test:
