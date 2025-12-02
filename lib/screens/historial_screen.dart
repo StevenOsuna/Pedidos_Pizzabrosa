@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/pedidos.dart';
 import '../services/pedido_service.dart';
 import 'package:intl/intl.dart';
+import '../widgets/custom_appbar.dart';
 
 class HistorialScreen extends StatelessWidget {
   final PedidoService pedidoService = PedidoService();
@@ -17,11 +18,8 @@ class HistorialScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text("Historial de Pedidos"),
-        backgroundColor: Colors.redAccent,
-        centerTitle: true,
-      ),
+      appBar: customAppBar("Historial"),
+
       body: StreamBuilder<List<Pedido>>(
         stream: pedidoService.obtenerHistorial(),
         builder: (context, snapshot) {

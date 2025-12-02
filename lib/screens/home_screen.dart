@@ -3,6 +3,7 @@ import 'cocina_screen.dart';
 import 'menu_page.dart';
 import 'historial_screen.dart';
 import 'clientes_screen.dart';
+import '../widgets/custom_appbar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,14 +14,7 @@ class HomeScreen extends StatelessWidget {
     final bool esCelular = ancho < 500;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red,
-        title: const Text(
-          'Pedidos Pizzabrosa',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),
-        centerTitle: true,
-      ),
+      appBar: customAppBar("Pedidos Pizzabrosa"),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Center(

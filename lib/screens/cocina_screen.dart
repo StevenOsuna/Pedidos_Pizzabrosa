@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/pedidos.dart';
 import '../services/pedido_service.dart';
+import '../widgets/custom_appbar.dart';
 
 class CocinaScreen extends StatefulWidget {
   const CocinaScreen({super.key});
@@ -132,11 +133,8 @@ class _CocinaScreenState extends State<CocinaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text('Cocina'),
-        backgroundColor: Colors.redAccent,
-        centerTitle: true,
-      ),
+      appBar: customAppBar("Cocina"),
+
       body: StreamBuilder<List<Pedido>>(
         stream: pedidoService.obtenerPedidosTiempoReal(),
         builder: (context, snapshot) {

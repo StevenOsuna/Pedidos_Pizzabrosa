@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../models/pedidos.dart';
 import 'package:intl/intl.dart';
+import '../widgets/custom_appbar.dart';
 
 class ComandaScreen extends StatefulWidget {
   final Pedido pedido;
@@ -133,10 +134,8 @@ class _ComandaScreenState extends State<ComandaScreen> {
     ).format(DateTime.fromMillisecondsSinceEpoch(pedido.timestamp));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Comanda'),
-        backgroundColor: Colors.redAccent,
-      ),
+      appBar: customAppBar("Comanda"),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

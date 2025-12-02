@@ -3,6 +3,7 @@ import '../models/pedidos.dart';
 import '../models/cliente.dart';
 import '../services/pedido_service.dart';
 import '../services/cliente_service.dart';
+import '../widgets/custom_appbar.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -38,11 +39,7 @@ class _MenuPageState extends State<MenuPage> {
     final esCelular = ancho < 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Generar pedido"),
-        backgroundColor: Colors.red,
-        centerTitle: true,
-      ),
+      appBar: customAppBar("Generar pedido"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(

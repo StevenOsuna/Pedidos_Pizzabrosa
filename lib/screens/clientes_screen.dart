@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/cliente.dart';
 import '../services/cliente_service.dart';
+import '../widgets/custom_appbar.dart';
 
 class ClientesScreen extends StatefulWidget {
   const ClientesScreen({super.key});
@@ -18,11 +19,7 @@ class _ClientesScreenState extends State<ClientesScreen> {
     final esCelular = ancho < 600;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Clientes frecuentes"),
-        backgroundColor: Colors.red,
-        centerTitle: true,
-      ),
+      appBar: customAppBar("Clientes frecuentes"),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         onPressed: () => _modalAgregarCliente(),
